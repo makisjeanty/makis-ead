@@ -59,6 +59,9 @@ class ClassroomController extends Controller
             }])->where('slug', $courseSlug)->firstOrFail();
         });
 
+        // Authorization: ensure user can view this course (free or enrolled)
+        $this->authorize('view', $course);
+
         if (!$lessonId) {
             $firstModule = $course->modules->sortBy('sort_order')->first();
             if ($firstModule && $firstModule->lessons->count() > 0) {
