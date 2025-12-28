@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  # --- SERVIÇOS PHP (LARAVEL) ---
+  app:
+    build: .
+    container_name: makis_ead_app
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    depends_on:
+      - db
+    # Dica de Arquiteto: Garanta que o .env do Laravel tenha DB_HOST=db
+
+  nginx:
+    image: nginx:alpine
+    container_name: makis_ead_nginx
+    ports:
+      - "8000:80" # Acesso ao Laravel: http://localhost:8000
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  # --- SERVIÇO PYTHON (FASTAPI) ---
+  python_api:
+    build: ./python_api # Procura o Dockerfile dentro da pasta python_api
+    container_name: makis_ead_python
+    ports:
+      - "8001:8000" # Acesso ao FastAPI: http://localhost:8001 (Mapeia 8000 do container para 8001 do host)
+    volumes:
+      - ./python_api:/app # Hot-reload: alterações no código refletem na hora
+    depends_on:
+      - db
+    environment:
+      # Passamos as credenciais para o Pydantic ler automaticamente
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+
+  # --- SERVIÇO DE BANCO DE DADOS (COMPARTILHADO) ---
+  db:
+    image: mysql:8.0
+    container_name: makis_ead_db
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    # Note: publishing the DB port to the host is not recommended for production. Uncomment for local dev only.
+    # ports:
+    #   - "3306:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dbdata:
