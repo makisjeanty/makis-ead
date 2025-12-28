@@ -81,3 +81,22 @@ Observações rápidas
 - Não comite credenciais sensíveis em .env.
 - Se preferir usar Docker, veja docker-compose.yml para orquestração dos serviços (app, nginx, python_api, db).
 - Se quiser que eu atualize README.md com um resumo destes passos, ou faça commit/push automático, me diga.
+
+Produção com Docker
+-------------------
+
+Para deploy em VPS usando Docker, há um arquivo `docker-compose.prod.yml` que cria imagens construídas (sem bind-mounts). Resumo:
+
+- Preparar `.env` local com as variáveis `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`.
+- Build e deploy:
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+- Recomenda-se ajustar `Dockerfile` para executar `composer install --no-dev --optimize-autoloader` durante a build (multi-stage) e copiar apenas `vendor` + `public/build` para a imagem final.
+- Não publique a porta do MySQL em produção; o `docker-compose.prod.yml` não publica `3306`.
+
+Se quiser, posso:
+- Criar um `Dockerfile` multi-stage que rode `composer install` no build e gere uma imagem otimizada.
+- Automatizar um script de deploy (build -> push para registry -> `docker pull` + `docker compose up -d`) para a VPS.

@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: makis-ead-app:latest
+    container_name: makis_ead_app_prod
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: makis_ead_nginx_prod
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    volumes:
+      # In production, mount only the nginx config and built assets if needed
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  db:
+    image: mysql:8.0
+    container_name: makis_ead_db_prod
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  dbdata:
+
+# Notes:
+# - This production compose builds the image and does NOT bind-mount the source code.
+# - Ensure you run `composer install --no-dev --optimize-autoloader` at build time in the Dockerfile
+#   or add build steps to this file as needed. The current `Dockerfile` installs extensions but does
+#   not run composer install during build; consider adding a multi-stage build for production.
