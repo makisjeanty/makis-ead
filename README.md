@@ -63,3 +63,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 Siga as instruções completas em `SETUP.md` para preparar o ambiente local, instalar dependências e executar a suíte de testes.
 
 Arquivo de referência: [SETUP.md](SETUP.md)
+
+Credenciais e CI
+-----------------
+
+O CI espera os seguintes segredos no GitHub Actions: `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_KEY`, `MERCADOPAGO_MODE`.
+Consulte `SECURITY/ROTATE_MERCADOPAGO.md` para o processo de rotação e atualização dos segredos.

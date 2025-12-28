@@ -55,6 +55,10 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: ':memory:'
+          # MercadoPago secrets (provided via GitHub Actions Secrets)
+          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
+          MERCADOPAGO_WEBHOOK_KEY: ${{ secrets.MERCADOPAGO_WEBHOOK_KEY }}
+          MERCADOPAGO_MODE: ${{ secrets.MERCADOPAGO_MODE }}
         run: |
           php artisan key:generate --force
           php artisan migrate --force --no-interaction || true

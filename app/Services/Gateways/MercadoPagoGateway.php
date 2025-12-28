@@ -14,7 +14,10 @@ class MercadoPagoGateway
     public function __construct()
     {
         $this->accessToken = config('services.mercadopago.access_token');
-        SDK::setAccessToken($this->accessToken);
+        // Only call the SDK setter if the MercadoPago SDK is installed in this environment.
+        if (class_exists('\\MercadoPago\\SDK')) {
+            SDK::setAccessToken($this->accessToken);
+        }
     }
 
     /**
@@ -69,13 +72,66 @@ class MercadoPagoGateway
     }
 
     /**
-     * Verify webhook signature
+     * Verify webhook signature or fall back to best-effort validation.
+     * Accepts raw payload and headers to allow cryptographic verification.
      */
-    public function verifyWebhook(array $data): bool
+    public function verifyWebhook(string $payload, array $headers = []): bool
     {
-        // Implement webhook signature verification
-        // For now, we'll return true, but you should implement proper verification
-        return true;
+        // If a webhook secret (key) is configured, attempt HMAC verification against
+        // common Mercado Pago signature headers. Supported header names: `x-meli-signature`,
+        // `x-mercadopago-signature` and `x-mp-signature`.
+        try {
+            $webhookKey = config('services.mercadopago.webhook_key');
+
+            if ($webhookKey) {
+                $signatureHeader = null;
+                $candidates = ['x-meli-signature', 'x-mercadopago-signature', 'x-mp-signature'];
+
+                foreach ($candidates as $h) {
+                    if (!empty($headers[$h])) {
+                        // Header bag can be an array of values
+                        $signatureHeader = is_array($headers[$h]) ? $headers[$h][0] : $headers[$h];
+                        break;
+                    }
+                }
+
+                if ($signatureHeader) {
+                    // Compute HMAC SHA256 using the webhook key. Many providers encode
+                    // the result as base64; some use hex. Compute both and compare.
+                    $hmacRaw = hash_hmac('sha256', $payload, $webhookKey, true);
+                    $hmacBase64 = base64_encode($hmacRaw);
+                    $hmacHex = bin2hex($hmacRaw);
+
+                    if (hash_equals($hmacBase64, $signatureHeader) || hash_equals($hmacHex, $signatureHeader)) {
+                        return true;
+                    }
+                    // If a signature header exists but doesn't match, reject immediately.
+                    return false;
+                }
+            }
+
+            // Fallback: if no webhook key or signature header is present, perform
+            // best-effort validation by extracting an id from the payload and
+            // checking the payment status via the Mercado Pago API.
+            $data = json_decode($payload, true);
+
+            $paymentId = null;
+            if (!empty($data['data']['id'])) {
+                $paymentId = $data['data']['id'];
+            } elseif (!empty($data['id'])) {
+                $paymentId = $data['id'];
+            }
+
+            if (!$paymentId) {
+                return false;
+            }
+
+            $info = $this->getPaymentStatus($paymentId);
+
+            return empty($info['error']);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
