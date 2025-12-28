@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /aluno
+Disallow: /checkout
+Disallow: /carrinho
+
+Sitemap: {{ url('/sitemap.xml') }}

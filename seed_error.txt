@@ -1,0 +1,52 @@
+
+  Dropping all tables ..................... 1 s DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table ........... 192.66ms DONE
+
+   INFO  Running migrations.  
+
+  2014_10_12_000000_create_users_table  373.94ms DONE
+  2025_12_22_023435_create_sessions_table  317.47ms DONE
+  2025_12_22_031205_create_orders_table  585.19ms DONE
+  2025_12_22_122724_create_personal_access_tokens_table  535.45ms DONE
+  2025_12_22_130321_create_user_progress_table  114.90ms DONE
+  2025_12_22_135134_create_ead_structure_tables  117.40ms DONE
+  2025_12_22_135318_create_ead_structure_tables  1 s DONE
+  2025_12_22_143304_add_details_to_courses_table  972.35ms DONE
+  2025_12_22_150621_add_missing_fields_to_courses_table  0.18ms DONE
+  2025_12_22_154816_create_categories_table  284.44ms DONE
+  2025_12_22_154826_create_enrollments_table  1 s DONE
+  2025_12_22_154828_create_payments_table . 1 s DONE
+  2025_12_22_154831_add_role_to_users_table  498.69ms DONE
+  2025_12_22_154833_update_courses_table_add_category_and_instructor  3 s DONE
+  2025_12_22_161544_create_launch_tables  110.26ms DONE
+  2025_12_22_162844_add_is_admin_to_users_table  996.35ms DONE
+  2025_12_22_182736_create_wallet_system  983.14ms DONE
+  2025_12_22_182839_add_payment_source_to_orders_table  504.73ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'role' (Connection: mysql, SQL: alter table `users` add `role` enum('admin', 'student', 'teacher', 'affiliate') not null default 'student' after `email`)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:826
+    822▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    823▕                 );
+    824▕             }
+    825▕ 
+  ➜ 826▕             throw new QueryException(
+    827▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    828▕             );
+    829▕         }
+    830▕     }
+
+      [2m+9 vendor frames [22m
+
+  10  database/migrations/2025_12_22_182839_add_payment_source_to_orders_table.php:11
+      Illuminate\Support\Facades\Facade::__callStatic("table")
+      [2m+37 vendor frames [22m
+
+  48  artisan:16
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+

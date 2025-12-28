@@ -8,9 +8,11 @@ use App\Models\Lesson;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache; // Importante: Importar o Cache
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ClassroomController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         // 1. PERFORMANCE: Cria uma chave única para esta busca específica
