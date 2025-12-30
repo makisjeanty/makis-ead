@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Enrollment;
+use App\Services\StudentProgressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache; // Importante: Importar o Cache
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,6 +14,14 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class ClassroomController extends Controller
 {
     use AuthorizesRequests;
+    
+    protected $progressService;
+
+    public function __construct(StudentProgressService $progressService)
+    {
+        $this->progressService = $progressService;
+    }
+
     public function index(Request $request)
     {
         // 1. PERFORMANCE: Cria uma chave única para esta busca específica
@@ -79,6 +88,14 @@ class ClassroomController extends Controller
             });
         }
 
-        return view('student.classroom.watch', compact('course', 'currentLesson'));
+        // Get course progress for the current user
+        $courseProgress = $this->progressService->getCourseProgress(auth()->user(), $course);
+
+        // Update progress for the current lesson
+        if ($currentLesson) {
+            $this->progressService->updateLessonProgress(auth()->user(), $currentLesson, $course);
+        }
+
+        return view('student.classroom.watch', compact('course', 'currentLesson', 'courseProgress'));
     }
 }

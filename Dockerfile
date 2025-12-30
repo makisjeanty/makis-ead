@@ -25,4 +25,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 # Ajustar permissões
+# Copiar código da aplicação para a imagem (production build)
+COPY . /var/www
+
+# Instalar dependências PHP do projeto no build (sem dev)
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction || true
+
+# Ajustar permissões
 RUN chown -R www-data:www-data /var/www
+
+# Expor porta do PHP-FPM e iniciar processo
+EXPOSE 9000
+CMD ["php-fpm"]

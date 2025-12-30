@@ -1,10 +1,13 @@
 version: "3.8"
 
 services:
+  # ===================================
+  # PHP-FPM Application
+  # ===================================
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: makis-ead-app:latest
     container_name: makis_ead_app_prod
     environment:
@@ -16,19 +19,60 @@ services:
       - DB_DATABASE=${MYSQL_DATABASE}
       - DB_USERNAME=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
+      - CACHE_STORE=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - storage_data:/var/www/storage
+      - ./public/uploads:/var/www/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
+    networks:
+      - makis_network
+    healthcheck:
+      test: [ "CMD", "php-fpm", "-t" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ===================================
+  # Nginx Web Server
+  # ===================================
   nginx:
     image: nginx:alpine
     container_name: makis_ead_nginx_prod
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     volumes:
-      # In production, mount only the nginx config and built assets if needed
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/var/www/public:ro
+      - ./storage/app/public:/var/www/storage/app/public:ro
+      - nginx_logs:/var/log/nginx
+      # SSL certificates (uncomment when ready)
+      # - /etc/letsencrypt:/etc/letsencrypt:ro
+    restart: unless-stopped
+    networks:
+      - makis_network
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  # ===================================
+  # MySQL Database
+  # ===================================
   db:
     image: mysql:8.0
     container_name: makis_ead_db_prod
@@ -39,13 +83,175 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
+    networks:
+      - makis_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Não expor porta 3306 em produção (segurança)
+    # ports:
+    #   - "3306:3306"
 
+    # ===================================
+    # Redis Cache
+    # ===================================
+  redis:
+    image: redis:7-alpine
+    container_name: makis_ead_redis_prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - makis_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===================================
+  # Python API (Gamification)
+  # ===================================
+  python_api:
+    build:
+      context: ./python_api
+      dockerfile: Dockerfile
+    image: makis-ead-python-api:latest
+    container_name: makis_ead_python_api_prod
+    environment:
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${MYSQL_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - makis_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Não expor porta 8000 em produção (apenas acesso interno)
+    # ports:
+    #   - "8001:8000"
+
+    # ===================================
+    # Queue Worker (Laravel)
+    # ===================================
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: makis-ead-app:latest
+    container_name: makis_ead_queue_prod
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - CACHE_STORE=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - storage_data:/var/www/storage
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - makis_network
+
+  # ===================================
+  # Scheduler (Laravel Cron)
+  # ===================================
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: makis-ead-app:latest
+    container_name: makis_ead_scheduler_prod
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - storage_data:/var/www/storage
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - makis_network
+
+# ===================================
+# Volumes
+# ===================================
 volumes:
   dbdata:
+    driver: local
+  redis_data:
+    driver: local
+  storage_data:
+    driver: local
+  nginx_logs:
+    driver: local
 
-# Notes:
-# - This production compose builds the image and does NOT bind-mount the source code.
-# - Ensure you run `composer install --no-dev --optimize-autoloader` at build time in the Dockerfile
-#   or add build steps to this file as needed. The current `Dockerfile` installs extensions but does
-#   not run composer install during build; consider adding a multi-stage build for production.
+# ===================================
+# Networks
+# ===================================
+networks:
+  makis_network:
+    driver: bridge
+
+# ===================================
+# NOTAS DE PRODUÇÃO:
+# ===================================
+# 1. Este compose usa Dockerfile.prod (multi-stage build otimizado)
+# 2. Redis configurado para cache e sessions
+# 3. Health checks em todos os serviços críticos
+# 4. Porta MySQL não exposta (segurança)
+# 5. Queue worker e scheduler incluídos
+# 6. Volumes nomeados para persistência
+# 7. Network isolada para comunicação entre serviços
+# 8. Restart policy: unless-stopped
+#
+# COMANDOS ÚTEIS:
+# - Build: docker compose -f docker-compose.prod.yml build --no-cache
+# - Start: docker compose -f docker-compose.prod.yml up -d
+# - Logs: docker compose -f docker-compose.prod.yml logs -f
+# - Stop: docker compose -f docker-compose.prod.yml down
+# - Restart: docker compose -f docker-compose.prod.yml restart
+#
+# VARIÁVEIS NECESSÁRIAS NO .env:
+# - MYSQL_DATABASE
+# - MYSQL_USER
+# - MYSQL_PASSWORD
+# - MYSQL_ROOT_PASSWORD
+# - REDIS_PASSWORD (opcional, padrão: changeme)

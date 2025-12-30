@@ -3,17 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Payment;
-use App\Services\PaymentService;
+use App\Services\WebhookService;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
-    protected $paymentService;
+    protected WebhookService $webhookService;
 
-    public function __construct(PaymentService $paymentService)
+    public function __construct(WebhookService $webhookService)
     {
-        $this->paymentService = $paymentService;
+        $this->webhookService = $webhookService;
     }
 
     /**
@@ -21,61 +20,31 @@ class WebhookController extends Controller
      */
     public function mercadopago(Request $request)
     {
-        Log::info('Mercado Pago Webhook received', $request->all());
-
-        $type = $request->input('type');
-
-        if ($type !== 'payment') {
-            return response()->json(['status' => 'ignored']);
-        }
-
-        $paymentId = $request->input('data.id');
-
-        if (!$paymentId) {
-            Log::warning('Mercado Pago webhook missing data.id', $request->all());
-            return response()->json(['error' => 'missing id'], 400);
-        }
+        Log::info('MercadoPago webhook received', $request->all());
 
         try {
-            $gateway = $this->paymentService->getGateway(Payment::GATEWAY_MERCADOPAGO);
-            $paymentInfo = $gateway->getPaymentStatus($paymentId);
-
-            if (!empty($paymentInfo['error'])) {
-                Log::error('Mercado Pago getPaymentStatus error', ['error' => $paymentInfo['error'], 'id' => $paymentId]);
-                return response()->json(['error' => 'gateway error'], 500);
-            }
-
-            // Only act on approved payments
-            if (($paymentInfo['status'] ?? null) === 'approved') {
-                // Try external_reference (our payment id) first
-                $externalReference = $request->input('external_reference');
-                $payment = null;
-
-                if ($externalReference) {
-                    $payment = Payment::find($externalReference);
-                }
-
-                // Fallback: find by transaction_id (preference id)
-                if (!$payment) {
-                    $payment = Payment::where('transaction_id', $paymentId)->first();
-                }
-
-                if ($payment && $payment->isPending()) {
-                    $this->paymentService->confirmPayment($payment, $paymentInfo);
-                    Log::info('Mercado Pago payment confirmed', ['payment_id' => $payment->id, 'gateway_id' => $paymentId]);
-                } else {
-                    Log::info('Mercado Pago payment not found or not pending', ['external_reference' => $externalReference, 'transaction_id' => $paymentId]);
-                }
-            }
+            $result = $this->webhookService->processMercadoPago($request->all());
+            
+            $statusCode = match($result['status']) {
+                'error' => 400,
+                'duplicate', 'ignored', 'already_processed' => 200,
+                'success' => 200,
+                default => 200
+            };
+            
+            return response()->json($result, $statusCode);
+            
         } catch (\Exception $e) {
-            Log::error('Mercado Pago Webhook Error', [
+            Log::error('MercadoPago webhook processing exception', [
                 'error' => $e->getMessage(),
-                'data' => $request->all(),
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'internal error'], 500);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Internal server error'
+            ], 500);
         }
-
-        return response()->json(['status' => 'ok']);
     }
 
     /**
@@ -83,40 +52,33 @@ class WebhookController extends Controller
      */
     public function stripe(Request $request)
     {
-        Log::info('Stripe Webhook', $request->all());
-
-        $payload = $request->getContent();
-        $signature = $request->header('Stripe-Signature');
+        Log::info('Stripe webhook received');
 
         try {
-            $gateway = $this->paymentService->getGateway(Payment::GATEWAY_STRIPE);
+            $payload = $request->getContent();
+            $signature = $request->header('Stripe-Signature');
             
-            if (!$gateway->verifyWebhook($payload, $signature)) {
-                return response()->json(['error' => 'Invalid signature'], 400);
-            }
-
-            $event = json_decode($payload, true);
-
-            if ($event['type'] === 'checkout.session.completed') {
-                $session = $event['data']['object'];
-                $paymentId = $session['metadata']['payment_id'] ?? null;
-                
-                if ($paymentId) {
-                    $payment = Payment::find($paymentId);
-                    
-                    if ($payment && $payment->isPending()) {
-                        $this->paymentService->confirmPayment($payment, $session);
-                    }
-                }
-            }
+            $result = $this->webhookService->processStripe($payload, $signature);
+            
+            $statusCode = match($result['status']) {
+                'error' => 400,
+                'duplicate', 'ignored', 'already_processed' => 200,
+                'success' => 200,
+                default => 200
+            };
+            
+            return response()->json($result, $statusCode);
+            
         } catch (\Exception $e) {
-            Log::error('Stripe Webhook Error', [
+            Log::error('Stripe webhook processing exception', [
                 'error' => $e->getMessage(),
-                'data' => $request->all(),
+                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => $e->getMessage()], 400);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Internal server error'
+            ], 500);
         }
-
-        return response()->json(['status' => 'ok']);
     }
 }

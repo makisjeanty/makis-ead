@@ -9,17 +9,31 @@ class Module extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'course_id',
+        'title',
+        'description',
+        'order',
+        'is_published',
+    ];
 
-    // Um Módulo pertence a um Curso
+    protected $casts = [
+        'order' => 'integer',
+        'is_published' => 'boolean',
+    ];
+
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    // Um Módulo tem muitas Aulas
     public function lessons()
     {
-        return $this->hasMany(Lesson::class);
+        return $this->hasMany(Lesson::class)->orderBy('order');
+    }
+    
+    public function getLessonsCountAttribute()
+    {
+        return $this->lessons()->count();
     }
 }

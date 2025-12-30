@@ -13,6 +13,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\WalletWebhookController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Student\ClassroomController;
 use App\Http\Controllers\Student\DashboardController;
 
@@ -47,7 +48,7 @@ Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index')
 Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
 
 // Sitemap
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Carrinho
 Route::get('/carrinho', [CartController::class, 'index'])->name('cart.index');

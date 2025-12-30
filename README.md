@@ -1,65 +1,322 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 Makis EAD - Plataforma de Ensino Online
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 12.0">
+  <img src="https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.3">
+  <img src="https://img.shields.io/badge/Filament-3.0-FFAA00?style=for-the-badge" alt="Filament 3.0">
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge" alt="Production Ready">
 </p>
 
-## About Laravel
+## 📋 Sobre o Projeto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Makis EAD** (Étude Rapide) é uma plataforma completa de ensino à distância desenvolvida para a comunidade francófona, com foco especial no Haiti. A plataforma oferece:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- 🎯 Sistema completo de cursos online
+- 🎮 Gamificação estilo Mimo (XP, streaks, badges)
+- 💳 Múltiplos gateways de pagamento (Stripe, MercadoPago, MonCash)
+- 👨‍🎓 Área do aluno com progresso tracking
+- 🔐 Sistema de autenticação robusto
+- 💰 Sistema de carteira digital
+- 📊 Painel administrativo com Filament
+- 🌍 Suporte multilíngue (Francês como padrão)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏗️ Stack Tecnológica
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Backend
+- **Laravel 12.0** - Framework PHP moderno
+- **PHP 8.3** - Última versão estável
+- **MySQL 8.0** - Banco de dados relacional
+- **Redis 7** - Cache e sessions de alta performance
+- **Laravel Sanctum** - Autenticação API
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Frontend
+- **Vite** - Build tool moderna
+- **Tailwind CSS** - Framework CSS utility-first
+- **Alpine.js** - Framework JavaScript leve
+- **Blade Templates** - Template engine do Laravel
 
-## Laravel Sponsors
+### Admin Panel
+- **Filament 3.0** - Painel administrativo completo
+- CRUD automático para todas as entidades
+- Dashboard com métricas em tempo real
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Gamificação
+- **Python FastAPI** - API de gamificação
+- Sistema de XP e níveis
+- Streaks e recompensas
+- Feedback inteligente
 
-### Premium Partners
+### Pagamentos
+- **Stripe** (via Laravel Cashier)
+- **MercadoPago** (América Latina)
+- **PagSeguro** (Brasil)
+- **MonCash** (Haiti)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### DevOps
+- **Docker** - Containerização
+- **Docker Compose** - Orquestração
+- **Nginx** - Servidor web
+- **Certbot** - SSL/HTTPS automático
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Quick Start
 
-## Code of Conduct
+### Pré-requisitos
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Docker 24.0+
+- Docker Compose 2.0+
+- Git
 
-## Security Vulnerabilities
+### Instalação (Desenvolvimento)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# 1. Clonar repositório
+git clone <url-do-repositorio>
+cd makis-ead
 
-## License
+# 2. Copiar .env
+cp .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 3. Configurar variáveis no .env
+# Edite o arquivo .env com suas configurações
 
-## Setup rápido
+# 4. Subir containers
+docker compose up -d
 
-Siga as instruções completas em `SETUP.md` para preparar o ambiente local, instalar dependências e executar a suíte de testes.
+# 5. Instalar dependências
+docker compose exec app composer install
+docker compose exec app npm install
 
-Arquivo de referência: [SETUP.md](SETUP.md)
+# 6. Gerar chave
+docker compose exec app php artisan key:generate
+
+# 7. Executar migrations
+docker compose exec app php artisan migrate --seed
+
+# 8. Criar usuário admin
+docker compose exec app php artisan make:filament-user
+
+# 9. Build assets
+docker compose exec app npm run build
+```
+
+Acesse: http://localhost:8000
+
+---
+
+## 📦 Deploy em Produção
+
+### Método Automatizado (Recomendado)
+
+```bash
+# 1. No servidor, clonar repositório
+git clone <url-do-repositorio> /var/www/makis-ead
+cd /var/www/makis-ead
+
+# 2. Configurar .env
+cp .env.example .env
+nano .env  # Configure todas as variáveis
+
+# 3. Executar script de deploy
+chmod +x deploy.sh
+./deploy.sh production
+```
+
+### Documentação Completa
+
+Para instruções detalhadas de deploy, consulte:
+
+- **[DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md)** - Checklist completo passo a passo
+- **[ANALISE_FINAL.md](ANALISE_FINAL.md)** - Análise completa e arquitetura
+- **[SETUP.md](SETUP.md)** - Setup para desenvolvimento local
+
+---
+
+## 📚 Estrutura do Projeto
+
+```
+makis-ead/
+├── app/
+│   ├── Filament/          # Recursos do painel admin
+│   ├── Http/              # Controllers e Middleware
+│   ├── Models/            # Modelos Eloquent
+│   └── Services/          # Serviços (Pagamentos, etc)
+├── database/
+│   ├── migrations/        # 24 migrations (2014-2025)
+│   └── seeders/           # Dados iniciais
+├── docker/
+│   ├── nginx/             # Configuração Nginx
+│   └── mysql/             # Configuração MySQL
+├── python_api/            # API de gamificação (FastAPI)
+├── resources/
+│   ├── views/             # Templates Blade
+│   └── js/                # JavaScript/Alpine
+├── routes/
+│   ├── web.php            # Rotas web
+│   └── auth.php           # Rotas de autenticação
+├── Dockerfile.prod        # Dockerfile multi-stage otimizado
+├── docker-compose.prod.yml # Compose para produção
+├── deploy.sh              # Script de deploy automatizado
+└── README.md              # Este arquivo
+```
+
+---
+
+## 🎯 Funcionalidades Principais
+
+### Para Alunos
+- ✅ Navegação de cursos por categoria
+- ✅ Sistema de carrinho de compras
+- ✅ Múltiplas opções de pagamento
+- ✅ Área do aluno com cursos matriculados
+- ✅ Player de vídeo integrado
+- ✅ Progresso de conclusão
+- ✅ Sistema de XP e gamificação
+- ✅ Certificados de conclusão
+
+### Para Administradores
+- ✅ Painel Filament completo
+- ✅ Gestão de cursos, módulos e aulas
+- ✅ Gestão de usuários e permissões
+- ✅ Relatórios de vendas
+- ✅ Gestão de pagamentos
+- ✅ Dashboard com métricas
+- ✅ Sistema de cupons/descontos
+
+### Sistema de Pagamentos
+- ✅ Stripe (cartão de crédito internacional)
+- ✅ MercadoPago (América Latina)
+- ✅ PagSeguro (Brasil)
+- ✅ MonCash (Haiti - carteira digital)
+- ✅ Sistema de assinaturas
+- ✅ Carteira digital interna
+
+---
+
+## 🔧 Comandos Úteis
+
+### Desenvolvimento
+
+```bash
+# Ver logs
+docker compose logs -f
+
+# Executar migrations
+docker compose exec app php artisan migrate
+
+# Limpar cache
+docker compose exec app php artisan cache:clear
+
+# Executar testes
+docker compose exec app php artisan test
+
+# Acessar container
+docker compose exec app bash
+```
+
+### Produção
+
+```bash
+# Ver status
+docker compose -f docker-compose.prod.yml ps
+
+# Ver logs
+docker compose -f docker-compose.prod.yml logs -f
+
+# Reiniciar serviços
+docker compose -f docker-compose.prod.yml restart
+
+# Backup do banco
+docker exec makis_ead_db_prod mysqldump -u root -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE > backup.sql
+```
+
+---
+
+## 📊 Arquitetura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     NGINX (Port 80/443)                     │
+│                    SSL/HTTPS com Certbot                    │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+       ┌───────────────┴───────────────┐
+       │                               │
+┌──────▼──────┐              ┌─────────▼────────┐
+│  Laravel    │              │   Python API     │
+│  PHP-FPM    │◄────────────►│   FastAPI        │
+│  (Port 9000)│              │   (Port 8000)    │
+└──────┬──────┘              └─────────┬────────┘
+       │                               │
+       │         ┌─────────────────────┤
+       │         │                     │
+┌──────▼─────────▼──────┐    ┌────────▼────────┐
+│      MySQL 8.0        │    │   Redis 7       │
+│    (Port 3306)        │    │  (Port 6379)    │
+└───────────────────────┘    └─────────────────┘
+```
+
+---
+
+## 🔒 Segurança
+
+- ✅ SSL/HTTPS obrigatório em produção
+- ✅ Firewall configurado (UFW)
+- ✅ Fail2Ban para proteção contra ataques
+- ✅ MySQL não exposto publicamente
+- ✅ Senhas hasheadas (bcrypt)
+- ✅ CSRF protection
+- ✅ XSS protection
+- ✅ SQL injection protection (Eloquent ORM)
+
+---
+
+## 📈 Performance
+
+- ✅ OPcache habilitado
+- ✅ Redis para cache e sessions
+- ✅ Query optimization
+- ✅ Assets minificados e comprimidos
+- ✅ Lazy loading de imagens
+- ✅ CDN ready
+
+---
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 📞 Suporte
+
+- 📧 Email: suporte@etuderapide.com
+- 📚 Documentação: [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md)
+- 🐛 Issues: [GitHub Issues](https://github.com/seu-usuario/makis-ead/issues)
+
+---
+
+## 🙏 Agradecimentos
+
+- Laravel Framework
+- Filament Admin Panel
+- Comunidade Open Source
+
+---
+
+**Desenvolvido com ❤️ para a comunidade francófona**
+

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CurrencyService
 {
@@ -20,6 +21,15 @@ class CurrencyService
 
         $rates = $this->getExchangeRates();
 
+        if (!isset($rates[$from]) || !isset($rates[$to])) {
+            Log::warning('Currency not supported for conversion', [
+                'from' => $from,
+                'to' => $to,
+                'available_rates' => array_keys($rates)
+            ]);
+            throw new \InvalidArgumentException("Currency not supported: {$from} or {$to}");
+        }
+
         // Convert to base currency (USD) first
         $amountInBase = $amount / $rates[$from];
 
@@ -32,7 +42,7 @@ class CurrencyService
      */
     public function getExchangeRates(): array
     {
-        return Cache::remember('exchange_rates', config('currency.api.cache_duration'), function () {
+        return Cache::remember('exchange_rates', config('currency.api.cache_duration', 3600), function () {
             // Try to fetch from API first
             $apiRates = $this->fetchRatesFromAPI();
             
@@ -40,8 +50,9 @@ class CurrencyService
                 return $apiRates;
             }
 
+            Log::warning('Using fallback currency rates from config');
             // Fallback to config rates
-            return config('currency.exchange_rates');
+            return config('currency.exchange_rates', []);
         });
     }
 
@@ -53,21 +64,34 @@ class CurrencyService
         $apiKey = config('currency.api.key');
         
         if (!$apiKey) {
+            Log::info('No API key configured for currency rates, using fallback');
             return null;
         }
 
         try {
-            $response = Http::get("https://v6.exchangerate-api.com/v6/{$apiKey}/latest/USD");
+            $response = Http::timeout(10)->get("https://v6.exchangerate-api.com/v6/{$apiKey}/latest/USD");
 
             if ($response->successful()) {
                 $data = $response->json();
-                return $data['conversion_rates'] ?? null;
+                
+                if (isset($data['result']) && $data['result'] === 'success') {
+                    Log::info('Successfully fetched currency rates from API');
+                    return $data['conversion_rates'] ?? null;
+                } else {
+                    Log::warning('Currency API returned error', ['error' => $data['result'] ?? 'Unknown error']);
+                    return null;
+                }
+            } else {
+                Log::warning('Currency API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                return null;
             }
         } catch (\Exception $e) {
-            \Log::warning('Currency API fetch failed', ['error' => $e->getMessage()]);
+            Log::error('Currency API fetch failed with exception', ['error' => $e->getMessage()]);
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -78,14 +102,21 @@ class CurrencyService
         $currencyData = config("currency.currencies.{$currency}");
         
         if (!$currencyData) {
-            return number_format($amount, 2);
+            Log::warning('Currency format configuration not found', ['currency' => $currency]);
+            return number_format($amount, 2, '.', ',');
         }
 
         $symbol = $currencyData['symbol'];
-        $decimals = $currencyData['decimals'];
-        $formatted = number_format($amount, $decimals, ',', '.');
+        $decimals = $currencyData['decimals'] ?? 2;
+        $position = $currencyData['symbol_position'] ?? 'before';
+        
+        $formatted = number_format($amount, $decimals, $currencyData['decimal_separator'] ?? '.', $currencyData['thousands_separator'] ?? ',');
 
-        return "{$symbol} {$formatted}";
+        if ($position === 'before') {
+            return "{$symbol}{$formatted}";
+        } else {
+            return "{$formatted} {$symbol}";
+        }
     }
 
     /**
@@ -97,7 +128,7 @@ class CurrencyService
             return auth()->user()->preferred_currency;
         }
 
-        return session('currency', config('currency.default'));
+        return session('currency', config('currency.default', 'USD'));
     }
 
     /**
@@ -105,6 +136,12 @@ class CurrencyService
      */
     public function setUserCurrency(string $currency): void
     {
+        // Validate currency
+        $supportedCurrencies = $this->getSupportedCurrencies();
+        if (!isset($supportedCurrencies[$currency])) {
+            throw new \InvalidArgumentException("Currency {$currency} is not supported");
+        }
+
         session(['currency' => $currency]);
 
         if (auth()->check()) {
@@ -117,6 +154,15 @@ class CurrencyService
      */
     public function getSupportedCurrencies(): array
     {
-        return config('currency.currencies');
+        return config('currency.currencies', []);
+    }
+    
+    /**
+     * Get the symbol for a currency
+     */
+    public function getSymbol(string $currency): string
+    {
+        $currencyData = config("currency.currencies.{$currency}");
+        return $currencyData['symbol'] ?? $currency;
     }
 }

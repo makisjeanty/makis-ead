@@ -44,10 +44,22 @@ class Course extends Model
     {
         return $this->hasMany(Module::class);
     }
+    
+    public function lessons()
+    {
+        return $this->hasManyThrough(Lesson::class, Module::class);
+    }
 
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class);
+    }
+    
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'enrollments')
+            ->withTimestamps()
+            ->withPivot('progress_percentage', 'completed_at', 'enrolled_at');
     }
 
     // Helper methods
@@ -55,6 +67,16 @@ class Course extends Model
     public function isFree()
     {
         return $this->price == 0;
+    }
+    
+    public function isPublished()
+    {
+        return $this->is_published === true;
+    }
+    
+    public function isPaid()
+    {
+        return $this->price > 0;
     }
 
     public function getEnrolledStudentsCountAttribute()

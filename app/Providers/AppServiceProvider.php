@@ -22,9 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+            $this->app['request']->server->set('HTTPS', 'on');
+        }
+
         // Register app policies
         Gate::policy(Course::class, CoursePolicy::class);
 
-        // Deixamos vazio. O Filament já está carregando via bootstrap/providers.php
+        // Register validation service provider
+        $this->app->register(ValidationServiceProvider::class);
     }
 }

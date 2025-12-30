@@ -16,6 +16,7 @@ class PaymentService
     {
         return Payment::create([
             'order_id' => $order->id,
+            'user_id' => $order->user_id,
             'gateway' => $gateway,
             'amount' => $order->total,
             'status' => Payment::STATUS_PENDING,

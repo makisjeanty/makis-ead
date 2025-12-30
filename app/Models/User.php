@@ -48,6 +48,13 @@ class User extends Authenticatable implements FilamentUser
 
     public function enrollments() { return $this->hasMany(Enrollment::class); }
     
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'enrollments')
+            ->withTimestamps()
+            ->withPivot('progress_percentage', 'completed_at', 'enrolled_at');
+    }
+    
     public function wallet()
     {
         return $this->hasOne(Wallet::class);
@@ -95,5 +102,23 @@ class User extends Authenticatable implements FilamentUser
     {
         // Se usar Cashier: return $this->subscribed('default');
         return $this->subscriptions()->where('stripe_status', 'active')->exists();
+    }
+    
+    /**
+     * Check if user has enrollment for a specific course
+     */
+    public function hasEnrollment(int $courseId): bool
+    {
+        return $this->enrollments()
+            ->where('course_id', $courseId)
+            ->exists();
+    }
+    
+    /**
+     * Check if user is enrolled in a course
+     */
+    public function isEnrolledIn(Course $course): bool
+    {
+        return $this->hasEnrollment($course->id);
     }
 }

@@ -47,6 +47,7 @@
     43 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
     44 => 'App\\Providers\\AppServiceProvider',
     45 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    46 => 'App\\Providers\\ValidationServiceProvider',
   ),
   'eager' => 
   array (
@@ -81,6 +82,7 @@
     28 => 'RyanChandler\\BladeCaptureDirective\\BladeCaptureDirectiveServiceProvider',
     29 => 'App\\Providers\\AppServiceProvider',
     30 => 'App\\Providers\\Filament\\AdminPanelProvider',
+    31 => 'App\\Providers\\ValidationServiceProvider',
   ),
   'deferred' => 
   array (
