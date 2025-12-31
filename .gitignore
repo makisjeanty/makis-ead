@@ -44,3 +44,7 @@ yarn-error.log*
 Homestead.json
 Homestead.yaml
 Thumbs.db
+temp_images/
+unique_images/
+temp_*.php
+*.tmp

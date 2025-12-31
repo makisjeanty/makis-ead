@@ -3,9 +3,10 @@
 namespace App\Services\Gateways;
 
 use App\Models\Payment;
-use MercadoPago\SDK;
-use MercadoPago\Preference;
-use MercadoPago\Item;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Client\Preference\PreferenceClient;
+use MercadoPago\Client\Payment\PaymentClient;
+use Illuminate\Support\Facades\Log;
 
 class MercadoPagoGateway
 {
@@ -14,7 +15,9 @@ class MercadoPagoGateway
     public function __construct()
     {
         $this->accessToken = config('services.mercadopago.access_token');
-        SDK::setAccessToken($this->accessToken);
+        if ($this->accessToken) {
+            MercadoPagoConfig::setAccessToken($this->accessToken);
+        }
     }
 
     /**
@@ -23,44 +26,44 @@ class MercadoPagoGateway
     public function createPayment(Payment $payment, array $paymentData): array
     {
         try {
-            $preference = new Preference();
+            $client = new PreferenceClient();
             
-            // Create item
-            $item = new Item();
-            $item->title = $paymentData['title'] ?? 'Curso';
-            $item->quantity = 1;
-            $item->unit_price = (float) $payment->amount;
-            
-            $preference->items = [$item];
-            
-            // Set URLs
-            $preference->back_urls = [
-                'success' => route('checkout.success'),
-                'failure' => route('checkout.failure'),
-                'pending' => route('checkout.pending'),
+            $preferenceRequest = [
+                "items" => [
+                    [
+                        "title" => $paymentData['title'] ?? 'Curso',
+                        "quantity" => 1,
+                        "unit_price" => (float) $payment->amount,
+                        "currency_id" => "BRL" // Adjust if using other currency
+                    ]
+                ],
+                "back_urls" => [
+                    "success" => route('checkout.success'),
+                    "failure" => route('checkout.failure'),
+                    "pending" => route('checkout.pending')
+                ],
+                "auto_return" => "approved",
+                "external_reference" => (string) $payment->id,
+                "notification_url" => route('webhook.mercadopago'),
+                "metadata" => [
+                    "payment_id" => $payment->id,
+                    "user_id" => $payment->user_id
+                ]
             ];
-            
-            $preference->auto_return = 'approved';
-            
-            // Set external reference
-            $preference->external_reference = $payment->id;
-            
-            // Set notification URL for webhooks
-            $preference->notification_url = route('webhook.mercadopago');
-            
-            // Save preference
-            $preference->save();
+
+            $preference = $client->create($preferenceRequest);
             
             return [
                 'success' => true,
                 'transaction_id' => $preference->id,
-                'checkout_url' => $preference->init_point,
+                'checkout_url' => $preference->init_point, // Use init_point for production
                 'metadata' => [
                     'preference_id' => $preference->id,
                     'sandbox_init_point' => $preference->sandbox_init_point,
                 ],
             ];
         } catch (\Exception $e) {
+            Log::error("MercadoPago Create Payment Error: " . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -73,8 +76,7 @@ class MercadoPagoGateway
      */
     public function verifyWebhook(array $data): bool
     {
-        // Implement webhook signature verification
-        // For now, we'll return true, but you should implement proper verification
+        // Implement webhook signature verification if needed
         return true;
     }
 
@@ -84,7 +86,8 @@ class MercadoPagoGateway
     public function getPaymentStatus(string $paymentId): array
     {
         try {
-            $payment = \MercadoPago\Payment::find_by_id($paymentId);
+            $client = new PaymentClient();
+            $payment = $client->get($paymentId);
             
             return [
                 'status' => $payment->status,
@@ -92,6 +95,7 @@ class MercadoPagoGateway
                 'transaction_amount' => $payment->transaction_amount,
             ];
         } catch (\Exception $e) {
+            Log::error("MercadoPago Get Status Error: " . $e->getMessage());
             return [
                 'error' => $e->getMessage(),
             ];

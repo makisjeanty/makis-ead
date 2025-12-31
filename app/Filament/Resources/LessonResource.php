@@ -13,8 +13,9 @@ use Filament\Tables\Table;
 class LessonResource extends Resource
 {
     protected static ?string $model = Lesson::class;
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
-    protected static ?string $navigationGroup = 'Gestão de Conteúdo';
+    protected static ?string $navigationIcon = 'heroicon-o-play-circle';
+    protected static ?string $navigationGroup = 'Gestão Acadêmica';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

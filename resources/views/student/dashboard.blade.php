@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Makis EAD</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -162,7 +163,7 @@
                             @foreach($recommendedCourses as $course)
                                 <div class="border rounded-lg overflow-hidden hover:shadow-lg transition">
                                     @if($course->image)
-                                        <img src="{{ asset($course->image) }}" alt="{{ $course->title }}"
+                                        <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}"
                                             class="w-full h-32 object-cover">
                                     @else
                                         <div class="w-full h-32 bg-gray-200 flex items-center justify-center">

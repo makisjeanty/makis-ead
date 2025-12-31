@@ -13,12 +13,12 @@ class Module extends Model
         'course_id',
         'title',
         'description',
-        'order',
+        'sort_order',
         'is_published',
     ];
 
     protected $casts = [
-        'order' => 'integer',
+        'sort_order' => 'integer',
         'is_published' => 'boolean',
     ];
 
@@ -29,9 +29,9 @@ class Module extends Model
 
     public function lessons()
     {
-        return $this->hasMany(Lesson::class)->orderBy('order');
+        return $this->hasMany(Lesson::class)->orderBy('sort_order');
     }
-    
+
     public function getLessonsCountAttribute()
     {
         return $this->lessons()->count();

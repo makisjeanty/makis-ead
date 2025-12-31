@@ -35,11 +35,36 @@ class User extends Authenticatable implements FilamentUser
 
     /**
      * Controle de acesso ao painel Filament
-     * Agora usa o campo 'role' em vez de 'is_admin'
+     * Verifica se o usuário tem a role 'admin'
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->role === 'admin' && $this->status === 'active';
+        return $this->hasRole('admin') && $this->status === 'active';
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* RBAC (Roles & Permissions)                   */
+    /* -------------------------------------------------------------------------- */
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasRole($role)
+    {
+        if (is_string($role)) {
+            return $this->roles->contains('name', $role);
+        }
+        return !! $role->intersect($this->roles)->count();
+    }
+
+    public function assignRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::where('name', $role)->firstOrFail();
+        }
+        $this->roles()->syncWithoutDetaching($role);
     }
 
     /* -------------------------------------------------------------------------- */

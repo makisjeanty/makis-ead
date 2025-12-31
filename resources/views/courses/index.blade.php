@@ -172,7 +172,7 @@
                                     <!-- Course Image -->
                                     <div class="h-48 bg-gradient-to-br from-purple-400 to-yellow-400 rounded-xl mb-4 relative overflow-hidden">
                                         @if($course->image)
-                                            <img src="{{ asset($course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                            <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
                                         @endif
                                         
                                         <!-- Pricing Tier Badge -->

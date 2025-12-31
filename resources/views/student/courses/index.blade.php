@@ -99,7 +99,7 @@
                     <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full overflow-hidden group transform hover:-translate-y-1">
                         
                         <div class="relative h-48 overflow-hidden bg-gray-100">
-                             <img loading="lazy" decoding="async" src="{{ $course->image_url ?? 'https://via.placeholder.com/400x250' }}" 
+                             <img loading="lazy" decoding="async" src="{{ $course->image ? asset('storage/' . $course->image) : ($course->image_url ?? 'https://via.placeholder.com/400x250') }}" 
                                  alt="{{ $course->title }}" 
                                  class="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-out">
                             

@@ -13,8 +13,8 @@ use Filament\Tables\Table;
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar'; // Ícone de dinheiro
-    protected static ?string $navigationGroup = 'Financeiro';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card'; // Ícone de cartão
+    protected static ?string $navigationGroup = 'Vendas & Financeiro';
 
     public static function form(Form $form): Form
     {

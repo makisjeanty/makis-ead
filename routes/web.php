@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\WebhookController;
@@ -52,7 +53,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 // Carrinho
 Route::get('/carrinho', [CartController::class, 'index'])->name('cart.index');
-Route::post('/carrinho/adicionar/{course}', [CartController::class, 'add'])->name('cart.add');
+Route::match(['get', 'post'], '/carrinho/adicionar/{course}', [CartController::class, 'add'])->name('cart.add');
 Route::delete('/carrinho/remover/{item}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/carrinho/limpar', [CartController::class, 'clear'])->name('cart.clear');
 
@@ -87,6 +88,10 @@ Route::post('/currency/set', [CurrencyController::class, 'setCurrency'])->name('
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+
+// Blog
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Subscription
 Route::get('/pricing', function () {

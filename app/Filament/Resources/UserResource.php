@@ -17,33 +17,60 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'Gestão de Alunos';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('country')
-                    ->required()
-                    ->maxLength(255)
-                    ->default('BR'),
-                Forms\Components\TextInput::make('avatar')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make('Dados Pessoais')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->label('Nome Completo'),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true),
+                        Forms\Components\TextInput::make('phone')
+                            ->tel()
+                            ->label('Telefone/WhatsApp'),
+                        Forms\Components\Select::make('country')
+                            ->options([
+                                'BR' => 'Brasil',
+                                'HT' => 'Haiti',
+                                'US' => 'Estados Unidos',
+                                'FR' => 'França',
+                            ])
+                            ->default('HT')
+                            ->label('País'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Acesso e Permissões')
+                    ->schema([
+                        Forms\Components\Select::make('role')
+                            ->options([
+                                'student' => 'Aluno',
+                                'admin' => 'Administrador',
+                                'teacher' => 'Professor',
+                            ])
+                            ->required()
+                            ->default('student'),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'active' => 'Ativo',
+                                'inactive' => 'Inativo',
+                                'banned' => 'Banido',
+                            ])
+                            ->required()
+                            ->default('active'),
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->required(fn (string $operation): bool => $operation === 'create'),
+                    ])->columns(2),
             ]);
     }
 

@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>{{ $course->title }} - Makis EAD</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -95,10 +96,19 @@
 
     <div class="hero">
         <div class="container">
-            <h1 style="font-size: 3rem; margin-bottom: 1rem;">{{ $course->title }}</h1>
-            <p style="font-size: 1.25rem;">{{ $course->description }}</p>
-            <div style="margin-top: 1.5rem;">
-                ⭐ {{ $course->rating }} • {{ $course->students_count }} alunos • {{ $course->duration_hours }}h
+            <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+                @if($course->image)
+                    <div style="flex: 0 0 300px; max-width: 100%;">
+                        <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    </div>
+                @endif
+                <div style="flex: 1;">
+                    <h1 style="font-size: 3rem; margin-bottom: 1rem;">{{ $course->title }}</h1>
+                    <p style="font-size: 1.25rem;">{{ $course->description }}</p>
+                    <div style="margin-top: 1.5rem;">
+                        ⭐ {{ $course->rating }} • {{ $course->students_count }} alunos • {{ $course->duration_hours }}h
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -113,12 +123,30 @@
         <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">{{ $course->instructor_name }}</p>
         <p style="color: #64748B;">{{ $course->instructor_bio ?? "Instrutor especializado" }}</p>
 
-        <div class="price">R$ {{ number_format($course->price, 2, ",", ".") }}</div>
-
         @auth
-            <a href="/carrinho/adicionar/{{ $course->id }}" class="btn">Adicionar ao Carrinho</a>
+            @if(auth()->user()->enrollments->contains('course_id', $course->id))
+                <a href="{{ route('student.classroom.watch', $course->slug) }}" class="btn" style="background-color: #8B5CF6; border-color: #8B5CF6;">
+                    Acessar Curso
+                </a>
+            @elseif($course->price == 0)
+                <div class="price" style="color: #10B981;">Gratuito</div>
+                <a href="{{ route('cart.add', $course->id) }}" class="btn" style="background-color: #10B981; border-color: #10B981;">
+                    Matricular-se Agora
+                </a>
+            @else
+                <div class="price">R$ {{ number_format($course->price, 2, ",", ".") }}</div>
+                <a href="{{ route('cart.add', $course->id) }}" class="btn">Adicionar ao Carrinho</a>
+            @endif
         @else
-            <a href="/login" class="btn">Fazer Login para Comprar</a>
+            @if($course->price == 0)
+                <div class="price" style="color: #10B981;">Gratuito</div>
+                <a href="{{ route('cart.add', $course->id) }}" class="btn" style="background-color: #10B981; border-color: #10B981;">
+                    Matricular-se Agora (Login Necessário)
+                </a>
+            @else
+                <div class="price">R$ {{ number_format($course->price, 2, ",", ".") }}</div>
+                <a href="{{ route('login') }}" class="btn">Fazer Login para Comprar</a>
+            @endif
         @endauth
     </div>
 </body>

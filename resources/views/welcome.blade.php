@@ -4,14 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Étude Rapide - Plateforme d'Apprentissage Premium</title>
-    <meta name="description"
-        content="Transformez votre avenir avec des cours en ligne de qualité premium. Rejoignez 10,000+ étudiants qui réussissent avec Étude Rapide.">
+    <title>Étude Rapide - Apprentissage Premium</title>
+    <meta name="description" content="Plateforme d'apprentissage en ligne premium pour développer vos compétences rapidement.">
     <link rel="icon" href="{{ asset('favicon.png') }}">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/luxury-premium.css') }}">
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <style>
@@ -91,7 +88,7 @@
                 <a href="/" class="flex items-center gap-3">
                     <img src="{{ asset('images/brand/logo.png') }}" alt="Étude Rapide" class="h-16">
                 </a>
-                
+
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8">
                     <a href="/cursos" class="text-gray-700 hover:text-purple-600 font-medium transition relative group">
@@ -106,12 +103,16 @@
                         Tarifs
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
                     </a>
+                    <a href="{{ route('blog.index') }}" class="text-gray-700 hover:text-purple-600 font-medium transition relative group">
+                        Blog
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
+                    </a>
                     <a href="/contact" class="text-gray-700 hover:text-purple-600 font-medium transition relative group">
                         Contact
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 transition-all duration-300 group-hover:w-full"></span>
                     </a>
                 </div>
-                
+
                 <!-- Auth Buttons -->
                 <div class="hidden md:flex items-center gap-4">
                     @auth
@@ -130,7 +131,7 @@
                         </a>
                     @endauth
                 </div>
-                
+
                 <!-- Mobile Menu Button -->
                 <button class="md:hidden" onclick="toggleMobileMenu()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,13 +140,14 @@
                     </svg>
                 </button>
             </div>
-            
+
             <!-- Mobile Menu -->
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
                 <div class="flex flex-col gap-4">
                     <a href="/cursos" class="text-gray-700 font-medium hover:text-purple-600">Cours</a>
                     <a href="#features" class="text-gray-700 font-medium hover:text-purple-600">Fonctionnalités</a>
                     <a href="/pricing" class="text-gray-700 font-medium hover:text-purple-600">Tarifs</a>
+                    <a href="{{ route('blog.index') }}" class="text-gray-700 font-medium hover:text-purple-600">Blog</a>
                     @auth
                         <a href="{{ route('student.dashboard') }}" class="text-purple-600 font-medium hover:text-purple-800">Dashboard</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -172,7 +174,7 @@
             <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse animation-delay-2000"></div>
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-4000"></div>
         </div>
-        
+
         <div class="container-premium relative z-10">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <!-- Left Content -->
@@ -181,18 +183,18 @@
                         <span class="text-2xl">✨</span>
                         <span class="text-base font-semibold">Plateforme #1 en Haïti</span>
                     </div>
-                    
+
                     <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                         Apprenez <span class="text-gradient-royal">Rapidement</span>,
                         <br />
                         <span class="text-yellow-300">Réussissez Brillamment</span>
                     </h1>
-                    
+
                     <p class="text-lg md:text-xl opacity-90 leading-relaxed max-w-lg">
-                        Transformez votre avenir avec des cours en ligne de qualité premium. 
+                        Transformez votre avenir avec des cours en ligne de qualité premium.
                         Rejoignez 10,000+ étudiants qui réussissent.
                     </p>
-                    
+
                     <div class="flex flex-col sm:flex-row gap-4 mt-10">
                         <a href="{{ route('register') }}" class="btn-premium text-lg px-8 py-4 justify-center relative overflow-hidden group">
                             <span class="relative z-10 flex items-center gap-2">
@@ -204,12 +206,12 @@
                             </span>
                             <span class="absolute inset-0 bg-gradient-to-r from-purple-700 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                         </a>
-                        
+
                         <a href="/cursos" class="px-8 py-4 bg-white text-purple-600 font-bold rounded-lg hover:bg-gray-100 transition text-center">
                             Explorer les Cours
                         </a>
                     </div>
-                    
+
                     <!-- Trust Indicators -->
                     <div class="flex items-center gap-8 mt-12 flex-wrap">
                         <div class="flex items-center gap-3">
@@ -226,7 +228,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Right Illustration -->
                 <div class="hidden md:block floating">
                     <div class="relative">
@@ -298,7 +300,7 @@
                 <h2 class="section-title text-4xl font-bold mb-4">Pourquoi Choisir Étude Rapide?</h2>
                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">Une plateforme conçue pour votre réussite avec des fonctionnalités premium</p>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-10">
                 <!-- Feature 1 -->
                 <div class="card-hover bg-gradient-to-br from-purple-50 to-white p-8 rounded-2xl shadow-lg border border-purple-100">
@@ -308,7 +310,7 @@
                     <h3 class="text-2xl font-bold mb-4 text-purple-900 text-center">Apprentissage Personnalisé</h3>
                     <p class="text-gray-600 text-center">Des parcours adaptés à votre niveau et vos objectifs pour une progression optimale</p>
                 </div>
-                
+
                 <!-- Feature 2 -->
                 <div class="card-hover bg-gradient-to-br from-teal-50 to-white p-8 rounded-2xl shadow-lg border border-teal-100">
                     <div class="feature-icon">
@@ -317,7 +319,7 @@
                     <h3 class="text-2xl font-bold mb-4 text-teal-900 text-center">Instructeurs Experts</h3>
                     <p class="text-gray-600 text-center">Apprenez avec des professionnels reconnus dans leur domaine</p>
                 </div>
-                
+
                 <!-- Feature 3 -->
                 <div class="card-hover bg-gradient-to-br from-yellow-50 to-white p-8 rounded-2xl shadow-lg border border-yellow-100">
                     <div class="feature-icon">
@@ -326,7 +328,7 @@
                     <h3 class="text-2xl font-bold mb-4 text-yellow-900 text-center">Certificats Reconnus</h3>
                     <p class="text-gray-600 text-center">Valorisez votre CV avec des certifications professionnelles</p>
                 </div>
-                
+
                 <!-- Feature 4 -->
                 <div class="card-hover bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg border border-blue-100">
                     <div class="feature-icon">
@@ -335,7 +337,7 @@
                     <h3 class="text-2xl font-bold mb-4 text-blue-900 text-center">Accès Multi-Appareils</h3>
                     <p class="text-gray-600 text-center">Étudiez où vous voulez, quand vous voulez, sur tous vos appareils</p>
                 </div>
-                
+
                 <!-- Feature 5 -->
                 <div class="card-hover bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl shadow-lg border border-green-100">
                     <div class="feature-icon">
@@ -344,7 +346,7 @@
                     <h3 class="text-2xl font-bold mb-4 text-green-900 text-center">Communauté Active</h3>
                     <p class="text-gray-600 text-center">Échangez avec des milliers d'étudiants motivés comme vous</p>
                 </div>
-                
+
                 <!-- Feature 6 -->
                 <div class="card-hover bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl shadow-lg border border-indigo-100">
                     <div class="feature-icon">
@@ -373,13 +375,13 @@
                     </svg>
                 </a>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8">
                 @foreach($courses->take(3) as $course)
                 <div class="card-hover bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                     <div class="h-56 bg-gradient-to-br from-purple-400 to-yellow-400 relative overflow-hidden">
                         @if($course->image)
-                            <img src="{{ asset($course->image) }}" alt="{{ $course->title }}"
+                            <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}"
                                 class="w-full h-full object-cover">
                         @endif
                         @if($course->price == 0)
@@ -425,7 +427,7 @@
                 <h2 class="text-4xl font-bold mb-4">Ce que disent nos étudiants</h2>
                 <p class="text-xl text-purple-200 max-w-2xl mx-auto">Rejoignez des milliers de personnes qui ont transformé leur vie avec Étude Rapide</p>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="bg-white bg-opacity-10 backdrop-blur-sm p-8 rounded-2xl">
                     <div class="text-yellow-300 text-4xl mb-4">"</div>
@@ -438,7 +440,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-white bg-opacity-10 backdrop-blur-sm p-8 rounded-2xl">
                     <div class="text-yellow-300 text-4xl mb-4">"</div>
                     <p class="text-lg mb-6">Grâce aux certifications obtenues, j'ai pu décrocher un emploi dans mon domaine d'expertise.</p>
@@ -450,7 +452,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="bg-white bg-opacity-10 backdrop-blur-sm p-8 rounded-2xl">
                     <div class="text-yellow-300 text-4xl mb-4">"</div>
                     <p class="text-lg mb-6">L'interface est intuitive et les instructeurs sont très compétents. Je recommande vivement!</p>
@@ -505,7 +507,7 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <div>
                     <h4 class="font-bold text-lg mb-4">Cours</h4>
                     <ul class="space-y-3 text-gray-400">
@@ -515,7 +517,7 @@
                         <li><a href="#" class="hover:text-white transition">Certifications</a></li>
                     </ul>
                 </div>
-                
+
                 <div>
                     <h4 class="font-bold text-lg mb-4">Support</h4>
                     <ul class="space-y-3 text-gray-400">
@@ -525,7 +527,7 @@
                         <li><a href="#" class="hover:text-white transition">Communauté</a></li>
                     </ul>
                 </div>
-                
+
                 <div>
                     <h4 class="font-bold text-lg mb-4">Légal</h4>
                     <ul class="space-y-3 text-gray-400">
@@ -536,25 +538,25 @@
                     </ul>
                 </div>
             </div>
-            
+
             <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
                 <p>&copy; {{ date('Y') }} Étude Rapide. Tous droits réservés.</p>
             </div>
         </div>
     </footer>
-    
+
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('hidden');
         }
-        
+
         // Add animation on scroll
         document.addEventListener('DOMContentLoaded', function() {
             const observerOptions = {
                 threshold: 0.1,
             };
-            
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -562,7 +564,7 @@
                     }
                 });
             }, observerOptions);
-            
+
             // Observe elements to animate
             document.querySelectorAll('.card-premium, .stat-number').forEach(el => {
                 observer.observe(el);

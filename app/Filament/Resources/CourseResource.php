@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CourseResource\Pages;
+use App\Filament\Resources\CourseResource\RelationManagers;
 use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -14,8 +15,9 @@ use Illuminate\Support\Str;
 class CourseResource extends Resource
 {
     protected static ?string $model = Course::class;
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
     protected static ?string $navigationGroup = 'Gestão Acadêmica';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -28,7 +30,7 @@ class CourseResource extends Resource
                             ->required()
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
-                        
+
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->unique(ignoreRecord: true),
@@ -61,7 +63,7 @@ class CourseResource extends Resource
                                 'Avançado' => 'Avançado',
                             ])
                             ->required(),
-                        
+
                         Forms\Components\TextInput::make('price')
                             ->label('Preço (0 para Grátis)')
                             ->numeric()
@@ -71,10 +73,13 @@ class CourseResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->label('Descrição Curta')
                             ->columnSpanFull(),
-                            
-                        Forms\Components\TextInput::make('image_url')
-                            ->url()
-                            ->label('URL da Imagem de Capa'),
+
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Imagem de Capa')
+                            ->image()
+                            ->directory('courses')
+                            ->disk('public')
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -83,7 +88,7 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image_url')->circular()->label('Capa'),
+                Tables\Columns\ImageColumn::make('image')->circular()->label('Capa'),
                 Tables\Columns\TextColumn::make('title')->label('Título')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Categoria')
@@ -103,7 +108,9 @@ class CourseResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\ModulesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

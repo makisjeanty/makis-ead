@@ -17,9 +17,7 @@ class EnrollmentResource extends Resource
     protected static ?string $model = Enrollment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-
     protected static ?string $navigationGroup = 'Gestão de Alunos';
-
     protected static ?int $navigationSort = 2;
 
     protected static ?string $label = 'Matrícula';
